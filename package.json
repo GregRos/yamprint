@@ -1,6 +1,6 @@
 {
   "name": "yamprint",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Library for pretty-printing objects inspired by YAML.",
   "main": "dist/lib/index.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "test": "dist/__tests__",
     "lib": "dist/lib"
   },
+  "keywords": ["pretty-print", "print", "stringify", "toString", "log"],
   "files": [
     "dist/",
     "src/"
