@@ -352,7 +352,7 @@ describe("automated tests", () => {
                 });
                 let c = b = Object.assign(Object.create(b), {
                     c : 3,
-                    cf : function() {}
+                    cf : function cf() {}
                 } as any);
                 let result = yp(c);
                 printNext(result);
