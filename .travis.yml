@@ -18,7 +18,7 @@ install:
   - npm install -g npm-run
 script:
   - npm run build
-  - npm-run istanbul cover ./dist/__tests__/jrunner.js --report lcovonly -- -R spec
+  - npm-run istanbul cover ./dist/__tests__/runner.js --report lcovonly -- -R spec
   - npm-run codecov
 node_js:
   - "6.1"
