@@ -1,6 +1,14 @@
 import {yamprint} from "../../lib/yamprint";
 import chalk = require('chalk');
 
+function sparseArray(...pairs : [any, any][]) : any[] {
+    let arr = [];
+    for (let [index, value] of pairs) {
+        arr[index] = value;
+    }
+    return arr;
+}
+
 describe("automated tests", () => {
 
     let _printNext = "";
@@ -441,6 +449,46 @@ describe("automated tests", () => {
         })
 
     });
+
+    class EvenExceptionsAreOkay extends Error {
+        get name() {
+            return this.constructor.name;
+        }
+    }
+    let result = yp({
+        obj : {
+            number : 123.45,
+            string : "hello",
+            boolean : false,
+            etc1 : null,
+            etc2 : undefined,
+            functionWithName : function nameOfFunction() {
+
+            },
+            array : [
+                {
+                    anotherNumber : 123454,
+                    symbol : Symbol.for("example")
+                },
+                [
+                    "nested",
+                    "array",
+                    [
+                        "even deeper"
+                    ]
+                ]
+            ],
+            sparseArray : sparseArray([1, "sparse"], [10, "array"], [5000, "with indexes and"], ["string", "keys"]),
+            get thrownException() {
+                throw new EvenExceptionsAreOkay()
+            }
+
+        },
+
+    });
+
+    console.log(result);
+
     it("", () => {
     });
 });
