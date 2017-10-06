@@ -95,7 +95,7 @@ export class ScalarFormatter implements ScalarFormatSpecifier {
             case "string":
                 return this.string(value);
             case "symbol":
-                return this.boolean(value);
+                return this.symbol(value);
             case "number":
                 return this.number(value);
         }
