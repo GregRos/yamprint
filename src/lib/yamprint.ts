@@ -1,4 +1,3 @@
-import _ = require("lodash");
 
 export interface IndentOptions {
     indentCount: number;
@@ -317,10 +316,11 @@ class RecursivePrinter {
 }
 
 export function yamprint(preferences ?: Partial<PrinterPreferences>) {
-    let prefs = _.defaults(preferences, {
-        scalarFormatter: new ScalarFormatter(),
-        keywordFormatter: new KeywordFormatter()
-    } as PrinterPreferences);
+    let prefs = {
+        scalarFormatter : new ScalarFormatter(),
+        keywordFormatter : new KeywordFormatter()
+    } as PrinterPreferences;
+    Object.assign(prefs, preferences);
     let printer = new RecursivePrinter(prefs);
     return (obj: any) => {
         return printer.print(obj);

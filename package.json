@@ -1,7 +1,7 @@
 {
-  "name": "yapp",
+  "name": "yamprint",
   "version": "0.1.0-beta",
-  "description": "Pretty printer with output similar to YAML.",
+  "description": "Library for pretty-printing objects inspired by YAML..",
   "main": "dist/lib/index.js",
   "scripts": {
     "test": "node ./dist/__tests__/runner.js",
@@ -22,7 +22,6 @@
     "@types/chalk": "^0.4.31",
     "@types/gulp": "^4.0.4",
     "@types/jasmine": "^2.6.0",
-    "@types/lodash": "^4.14.75",
     "@types/node": "^8.0.30",
     "chalk": "^2.1.0",
     "del": "^3.0.0",
@@ -38,8 +37,6 @@
     "typescript": "^2.5.2"
   },
   "dependencies": {
-    "lodash": "^4.17.4",
-    "string-format": "^0.5.0",
     "tslib": "^1.7.1"
   }
 }
