@@ -315,14 +315,33 @@ class RecursivePrinter {
     }
 }
 
-export function yamprint(preferences ?: Partial<PrinterPreferences>) {
-    let prefs = {
-        scalarFormatter : new ScalarFormatter(),
-        keywordFormatter : new KeywordFormatter()
-    } as PrinterPreferences;
+
+
+const defaultProps = () => ({
+    scalarFormatter : new ScalarFormatter(),
+    keywordFormatter : new KeywordFormatter()
+} as PrinterPreferences);
+
+function create(preferences ?: Partial<PrinterPreferences> | any) {
+    let prefs = defaultProps();
     Object.assign(prefs, preferences);
     let printer = new RecursivePrinter(prefs);
     return (obj: any) => {
         return printer.print(obj);
     }
 }
+
+let def = create();
+
+export const yamprint = function Yamprint(obj : any) {
+    return def(obj);
+} as any as {
+
+    (obj : any) : string;
+    create(preferences ?: Partial<PrinterPreferences>) : (obj : any) => string;
+};
+yamprint.create = create;
+
+
+
+

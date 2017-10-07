@@ -28,11 +28,11 @@ describe("automated tests", () => {
     };
     describe("construct", () => {
         it("basic construct", () => {
-            let yp = yamprint();
+            let yp = yamprint;
         });
     });
 
-    let yp = yamprint();
+    let yp = yamprint.create();
 
     describe("edge cases", () => {
         describe("circular ref", () => {
