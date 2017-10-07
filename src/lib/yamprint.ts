@@ -166,10 +166,10 @@ export class KeywordFormatter implements KeywordFormatSpecifier {
                 line += " Error";
             }
         }
-        return `!!! ${line} !!!`;
+        return `‼ ${line} ‼`;
     }
     circular = "~Circular~";
-    arrayPrefix = "▸ ";
+    arrayPrefix = "► ";
     indent = "  ";
 }
 

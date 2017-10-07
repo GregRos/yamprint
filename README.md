@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/GregRos/yamprint/branch/master/graph/badge.svg)](https://codecov.io/gh/GregRos/yamprint)
 [![npm](https://badge.fury.io/js/yamprint.svg )](https://www.npmjs.com/package/yamprint)
 
-`yamprint` is yet another pretty-printing library, inspired by YAML syntax. 
+`yamprint` is yet another pretty-printing library, with output inspired by YAML syntax.
 
 `yamprint` stringifies objects into a convenient syntax that allows you to easily inspect their properties. It is also highly customizable and supports printing many types of data.
 
@@ -18,17 +18,17 @@ obj =
   etc2 = undefined
   functionWithName = [function nameOfFunction]
   array = 
-    ▸ anotherNumber = 123454
+    ► anotherNumber = 123454
       symbol = Symbol(example)
-    ▸ ▸ 'nested'
-      ▸ 'array'
-      ▸ ▸ 'even deeper'
+    ► ► 'nested'
+      ► 'array'
+      ► ► 'even deeper'
   sparseArray = 
-    (1) ▸ 'sparse'
-    (10) ▸ 'array'
-    (5000) ▸ 'with indexes and'
-    'string' ▸ 'keys'
-  thrownException = !!! THREW EvenExceptionsAreOkay !!!
+    (1) ► 'sparse'
+    (10) ► 'array'
+    (5000) ► 'with indexes and'
+    'string' ► 'keys'
+  thrownException = ‼ THREW EvenExceptionsAreOkay ‼
 ```
 ## Usage
 Import the `yamprint` function:
