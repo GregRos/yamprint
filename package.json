@@ -1,6 +1,6 @@
 {
   "name": "yamprint",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Library for pretty-printing objects inspired by YAML.",
   "main": "dist/lib/index.js",
   "scripts": {
@@ -12,7 +12,13 @@
     "test": "dist/__tests__",
     "lib": "dist/lib"
   },
-  "keywords": ["pretty-print", "print", "stringify", "toString", "log"],
+  "keywords": [
+    "pretty-print",
+    "print",
+    "stringify",
+    "toString",
+    "log"
+  ],
   "files": [
     "dist/",
     "src/"
@@ -22,7 +28,6 @@
   "devDependencies": {
     "@types/chalk": "^0.4.31",
     "@types/gulp": "^4.0.4",
-    "@types/istanbul": "^0.4.29",
     "@types/jasmine": "^2.6.0",
     "@types/node": "^8.0.30",
     "chalk": "^2.1.0",
@@ -34,7 +39,6 @@
     "gulp-sourcemaps": "^2.6.1",
     "gulp-typescript": "^3.2.2",
     "istanbul": "^0.4.5",
-    "istanbul-lib-source-maps": "^1.2.1",
     "jasmine": "^2.8.0",
     "jasmine-spec-reporter": "^4.2.1",
     "merge2": "^1.2.0",
