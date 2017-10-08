@@ -1,8 +1,11 @@
 
-export interface IndentOptions {
-    indentCount: number;
-    indentString: string;
-}
+import {KeywordFormatter} from "./keyword-formatter";
+import {ScalarFormatSpecifier, ScalarFormatter} from "./scalar-formatter";
+
+
+export type PostTransform = (input : string) => string;
+
+
 
 class IndentedWriter {
     private _inner = "";
@@ -38,140 +41,8 @@ class IndentedWriter {
     }
 }
 
-export interface ScalarFormatSpecifier {
-    number: (num: number) => string;
-    string: (str: string) => string;
-    symbol: (sym: Symbol) => string;
-    boolean: (bool: boolean) => string;
-    date: (date: Date) => string;
-    regexp: (regexp: RegExp) => string;
-    empty: (special: null | undefined) => string;
-    fallback: (obj: object) => string | null;
-}
 
-export class ScalarFormatter implements ScalarFormatSpecifier {
-    number(n) {
-        return n.toString();
-    };
 
-    string(s) {
-        return `'${s}'`;
-    }
-
-    symbol(s) {
-        return s.toString()
-    }
-
-    boolean(b) {
-        return b.toString();
-    }
-
-    empty(e) {
-        return e === null ? "null" : "undefined";
-    }
-
-    date(d) {
-        return d.toString();
-    }
-
-    regexp(r) {
-        return r.toString();
-    }
-
-    fallback(o) {
-        return null;
-    }
-
-    formatScalar(value: any): string | null {
-        if (value == null) {
-            return this.empty(value);
-        }
-        if ([String, Number, Boolean, Symbol].some(ctor => value instanceof ctor)) {
-            value = value.valueOf();
-        }
-        switch (typeof value) {
-            case "boolean":
-                return this.boolean(value);
-            case "string":
-                return this.string(value);
-            case "symbol":
-                return this.symbol(value);
-            case "number":
-                return this.number(value);
-        }
-        if (value instanceof Date) {
-            return this.date(value);
-        } else if (value instanceof RegExp) {
-            return this.regexp(value);
-        } else {
-            return this.fallback(value);
-        }
-    }
-}
-
-export interface KeywordFormatSpecifier {
-    propertyKey: (key: string) => string;
-    constructorTag: (ctor: string, hasKeys: boolean) => string;
-    arrayPrefix: string
-    indent: string;
-    threwAlert : (error : any) => string;
-    sparseArrayIndex : (index : number | string) => string;
-}
-
-export class KeywordFormatter implements KeywordFormatSpecifier {
-    propertyKey(key: string) {
-        key = /[^a-zA-Z0-9_$]/.test(key) ? `'${key}'` : key;
-        return `${key} = `;
-    }
-
-    constructorTag(instance: any, hasKeys: boolean) {
-        let line = "";
-        if (instance instanceof Function) {
-            line = "function";
-            if (instance.name) {
-                line += " " + instance.name;
-            }
-        }
-        else if (instance instanceof Error) {
-            line = instance.name || "Error";
-            if (instance.message) {
-                line += " - " + instance.message;
-            }
-        }
-        else {
-            let ctor = instance.constructor;
-            if (ctor === Object || !ctor) {
-                return hasKeys ? "" : "[Object]";
-            }
-            line = instance.constructor && instance.constructor.name;
-        }
-        return line && `[${line}]` || "";
-    };
-
-    sparseArrayIndex(ix : number | string) {
-        return !Number.isNaN(+ix) ? `(${ix}) ` : `'${ix}' `;
-    }
-
-    threwAlert(err : any) {
-        let line = "THREW";
-        if (!(err instanceof Error)) {
-            line += " " + (err  && err.toString || Object.prototype.toString).call(err);
-        }
-        else {
-            if (err.name) {
-                line += " " + err.name;
-            } else if (err.constructor && err.constructor.name) {
-                line += `${err.constructor.name}`;
-            } else {
-                line += " Error";
-            }
-        }
-        return `‼ ${line} ‼`;
-    }
-    circular = "~Circular~";
-    arrayPrefix = "► ";
-    indent = "  ";
-}
 
 export interface PrinterPreferences {
     scalarFormatter: ScalarFormatter;

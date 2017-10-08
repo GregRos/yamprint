@@ -1,3 +1,5 @@
 
 
-export {yamprint, KeywordFormatter, ScalarFormatter, IndentOptions, ScalarFormatSpecifier, PrinterPreferences, KeywordFormatSpecifier} from './yamprint';
+export {yamprint, PrinterPreferences} from './yamprint';
+export {KeywordFormatSpecifier, KeywordFormatter} from './keyword-formatter';
+export {ScalarFormatSpecifier, ScalarFormatter} from './scalar-formatter';

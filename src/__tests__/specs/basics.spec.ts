@@ -195,6 +195,14 @@ describe("automated tests", () => {
             expect(result).toMatch(/a.*1/);
             printNext(result);
         });
+
+        it("error prototype", () => {
+            class MyError extends Error {
+
+            }
+            let result = yp(new MyError("something"));
+            printNext(result);
+        })
     });
 
     describe("more complex objects", () => {
