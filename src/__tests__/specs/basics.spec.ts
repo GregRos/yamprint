@@ -179,7 +179,7 @@ describe("automated tests", () => {
         it("object prototype visible when empty", () => {
             let o = {};
             let result = yp(o);
-            expect(result).toBe("[Object]");
+            expect(result).toContain("");
             printNext(result);
         });
 
@@ -262,7 +262,7 @@ describe("automated tests", () => {
 
         it("multi element array", () => {
             let result = yp([1, true, "hi", {}]);
-            expect(result).toMatch(/[\s\S]*1[\s\S]*true[\s\S]*'hi'[\s\S]*Object/)
+            expect(result).toMatch(/[\s\S]*1[\s\S]*true[\s\S]*'hi'/)
             printNext(result);
         });
 
@@ -400,7 +400,7 @@ describe("automated tests", () => {
                 let result = yp(x);
 
                 printNext(result);
-                expect(result).toMatch(/\[C]/);
+                expect(result).toMatch(/C/);
                 expect(result).toMatch(/a.*1/);
                 expect(result).toMatch(/b.*2/);
                 expect(result).toMatch(/c.*3/);
@@ -463,20 +463,46 @@ describe("automated tests", () => {
             return this.constructor.name;
         }
     }
+    let circ = {
+        a : null
+    };
+
+    circ.a = circ;
+
+    let arrCircular = {
+        arr : []
+    };
+
+    arrCircular.arr.push(arrCircular);
+    arrCircular.arr.push(12355);
     let result = yp({
-        obj : {
-            number : 123.45,
-            string : "hello",
-            boolean : false,
-            etc1 : null,
-            etc2 : undefined,
-            functionWithName : function nameOfFunction() {
+        obj: {
+            number: 123.45,
+            string: "hello",
+            boolean: false,
+            etc1: null,
+            etc2: undefined,
+            regexp : /(abc)+/,
+            date : new Date(),
+            circular : circ,
+            arrCircular : arrCircular,
+            withPrototype : new function ProtoName() {
 
             },
-            array : [
+            withPrototypeAndKeys : new function OtherProtoName() {
+                this.a = 2345;
+                this.b = [];
+                this.c = {
+
+                };
+            },
+            functionWithName: function nameOfFunction() {
+
+            },
+            array: [
                 {
-                    anotherNumber : 123454,
-                    symbol : Symbol.for("example")
+                    anotherNumber: 123454,
+                    symbol: Symbol.for("example")
                 },
                 [
                     "nested",
@@ -486,11 +512,10 @@ describe("automated tests", () => {
                     ]
                 ]
             ],
-            sparseArray : sparseArray([1, "sparse"], [10, "array"], [5000, "with indexes and"], ["string", "keys"]),
             get thrownException() {
-                throw new EvenExceptionsAreOkay()
-            }
-
+                throw new Error("asdf")
+            },
+            sparseArray : sparseArray([1, "sparse"], [10, "array"], [5000, "with indexes and"], ["string", "keys"])
         },
 
     });

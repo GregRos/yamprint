@@ -1,6 +1,5 @@
 
-import {KeywordFormatter} from "./keyword-formatter";
-import {ScalarFormatSpecifier, ScalarFormatter} from "./scalar-formatter";
+import {FormatSpecifier, YamprintFormatter} from "./keyword-formatter";
 
 
 export type PostTransform = (input : string) => string;
@@ -12,9 +11,12 @@ class IndentedWriter {
     private _depth = 0;
     private _needsIndent = false;
 
+    constructor(private _indentStr : string) {
+
+    }
     write(str: string) {
         if (this._needsIndent) {
-            str = "\n" + "  ".repeat(this._depth) + str;
+            str = "\n" + this._indentStr.repeat(this._depth) + str;
             this._needsIndent = false;
         }
         this._inner += str;
@@ -41,22 +43,12 @@ class IndentedWriter {
     }
 }
 
-
-
-
-export interface PrinterPreferences {
-    scalarFormatter: ScalarFormatter;
-    keywordFormatter: KeywordFormatter;
-}
-
-
-
 class RecursivePrinter {
     private _knownNodes: any[] = [];
-    private _writer = new IndentedWriter();
+    private _writer : IndentedWriter;
 
-    constructor(private _preferences: PrinterPreferences) {
-
+    constructor(private _formatter : YamprintFormatter) {
+        this._writer = new IndentedWriter(_formatter.indent);
     }
 
     print(o: any) {
@@ -67,10 +59,11 @@ class RecursivePrinter {
         return str;
     }
 
-    private _printArray(value: any[]) {
-        let {_writer, _preferences : {keywordFormatter}} = this;
+    protected _printArray(value: any[]) {
+        let {_writer, _formatter} = this;
         if (value.length === 0) {
-            _writer.write("[]");
+            _writer.writeLine("[]");
+            return;
         }
         let lastIndex = -1;
         let isSparse = value.some((x, index) => {
@@ -80,9 +73,9 @@ class RecursivePrinter {
         });
 
         Object.keys(value).forEach(key => {
-            if (isSparse || Number.isNaN(+key)) _writer.write(keywordFormatter.sparseArrayIndex(key));
+            if (isSparse || Number.isNaN(+key)) _writer.write(_formatter.sparseArrayIndex(key));
             let item = value[key];
-            _writer.write(keywordFormatter.arrayPrefix);
+            _writer.write(_formatter.arrayPrefix);
             _writer.indent(1);
             this._printObject(item, false);
             _writer.indent(-1);
@@ -127,13 +120,16 @@ class RecursivePrinter {
         });
         getInheritedValueKeys(value);
 
-        let {_writer, _preferences: {keywordFormatter}} = this;
-
+        let {_writer, _formatter} = this;
+        if (keys.size === 0) {
+            _writer.writeLine(_formatter.scalarObjectTag(value));
+            return;
+        }
         if (asValue) {
             _writer.indent(1);
         }
 
-        let typeLine = keywordFormatter.constructorTag(value, keys.size > 0);
+        let typeLine = _formatter.constructorTag(value);
 
         if (typeLine) {
             _writer.writeLine(typeLine);
@@ -142,9 +138,9 @@ class RecursivePrinter {
             _writer.writeLine();
         }
         for (let [key, v] of keys) {
-            _writer.write(keywordFormatter.propertyKey(key));
+            _writer.write(_formatter.propertyKey(key));
             if (v instanceof ErrMarker) {
-                _writer.write(keywordFormatter.threwAlert(v.error));
+                _writer.write(_formatter.threwAlert(v.error));
             } else {
                 this._printObject(v, true);
             }
@@ -156,15 +152,15 @@ class RecursivePrinter {
     }
 
     private _printObject(value: any, asValue: boolean) {
-        let {_writer, _preferences: {keywordFormatter, scalarFormatter}} = this;
-        let scalar = scalarFormatter.formatScalar(value);
+        let {_writer, _formatter} = this;
+        let scalar = _formatter.formatScalar(value);
 
         if (scalar != null) {
             _writer.writeLine(scalar);
             return;
         } else {
             if (this._knownNodes.indexOf(value) >= 0) {
-                _writer.writeLine(keywordFormatter.circular);
+                _writer.writeLine(_formatter.circular);
                 return;
             }
             this._knownNodes.push(value);
@@ -186,17 +182,9 @@ class RecursivePrinter {
     }
 }
 
-
-
-const defaultProps = () => ({
-    scalarFormatter : new ScalarFormatter(),
-    keywordFormatter : new KeywordFormatter()
-} as PrinterPreferences);
-
-function create(preferences ?: Partial<PrinterPreferences> | any) {
-    let prefs = defaultProps();
-    Object.assign(prefs, preferences);
-    let printer = new RecursivePrinter(prefs);
+function create(formatter ?: YamprintFormatter) {
+    formatter = formatter || new YamprintFormatter();
+    let printer = new RecursivePrinter(formatter);
     return (obj: any) => {
         return printer.print(obj);
     }
@@ -209,7 +197,7 @@ export const yamprint = function Yamprint(obj : any) {
 } as any as {
 
     (obj : any) : string;
-    create(preferences ?: Partial<PrinterPreferences>) : (obj : any) => string;
+    create(preferences ?: YamprintFormatter) : (obj : any) => string;
 };
 yamprint.create = create;
 
