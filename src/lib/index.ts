@@ -1,4 +1,4 @@
 
 
 export {yamprint} from './yamprint';
-export {FormatSpecifier, YamprintFormatter} from './yamprint-formatter';
+export {FormatSpecifier, YamprintFormatter, YamprintTheme} from './yamprint-formatter';

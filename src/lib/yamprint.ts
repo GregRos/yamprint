@@ -5,8 +5,6 @@ import {FormatSpecifier, YamprintFormatter, YamprintTheme} from "./yamprint-form
 import ww = require('wordwrap');
 import {IndentedWriter} from "./indented-writer";
 
-export type PostTransform = (input : string) => string;
-
 class RecursivePrinter {
     private _knownNodes: any[] = [];
     private _writer : IndentedWriter;

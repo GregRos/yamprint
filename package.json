@@ -1,6 +1,6 @@
 {
   "name": "yamprint",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Library for pretty-printing objects inspired by YAML.",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
@@ -51,8 +51,6 @@
     "typescript": "^2.5.2"
   },
   "dependencies": {
-    "tslib": "^1.7.1",
-    "word-wrap": "^1.2.3",
-    "wordwrap": "^1.0.0"
+    "tslib": "^1.7.1"
   }
 }
