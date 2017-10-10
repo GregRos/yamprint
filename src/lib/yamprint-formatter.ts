@@ -1,5 +1,5 @@
-import {PostTransform} from "./yamprint";
 
+import ww = require('wordwrap');
 export interface FormatSpecifier {
     propertyKey: (key: string) => string;
     constructorTag: (ctor: string) => string;
@@ -7,7 +7,8 @@ export interface FormatSpecifier {
     indent: string;
     threwAlert : (error : any) => string;
     sparseArrayIndex : (index : number | string) => string;
-
+    circular : string;
+    multilineMargin : string;
 
     number: (num: number) => string;
     string: (str: string) => string;
@@ -20,6 +21,10 @@ export interface FormatSpecifier {
     fallback: (obj: object) => string | null;
     scalarObjectTag : (obj : any) => string;
 }
+
+export type YamprintTheme = {
+    [K in keyof FormatSpecifier] ?: (s: string) => string;
+    }
 
 
 export class YamprintFormatter implements FormatSpecifier {
@@ -38,24 +43,47 @@ export class YamprintFormatter implements FormatSpecifier {
         return `${key} = `;
     }
 
-    constructorTag(instance: any) {
-        let line = "";
-        if (instance instanceof Function) {
-            line = "function";
-            if (instance.name) {
-                line += " " + instance.name;
+    theme(theme : YamprintTheme) {
+        let self = this as any;
+        class ThemedYampritFormatter extends YamprintFormatter {
+            constructor(colors : YamprintTheme) {
+                super();
+                Object.keys(colors).forEach(k => {
+                    if (typeof this[k] == "function") {
+                        this[k] = function (...args: any[]) {
+                            return colors[k].call(colors, self[k].apply(this, args));
+                        };
+                    } else {
+                        this[k] = colors[k].call(colors, this[k]);
+                    }
+                });
             }
         }
-        else if (instance instanceof Error) {
-            line = instance.name || "Error";
+
+        return new ThemedYampritFormatter(theme) as YamprintFormatter;
+    }
+
+    constructorTag(instance: any) {
+        let line = "";
+        if (instance instanceof Error) {
+            let regularName = instance.name;
+            if (regularName === "Error" || !regularName) {
+                regularName = instance.constructor && instance.constructor.name;
+            }
+            regularName = regularName || "Error";
+            line += regularName;
             if (instance.message) {
-                line += " - " + instance.message;
+                line += `("${instance.message}")`;
             }
         }
         else {
             let ctor = instance.constructor;
-            if (ctor === Object || !ctor) return "";
-            line = instance.constructor && instance.constructor.name;
+            if (ctor === Object || !ctor) {
+                return "";
+            }
+            if (instance.constructor) {
+                line = instance.constructor.name || "~anonymous~";
+            }
         }
         return this._formatCtorTag(line);
     };
@@ -64,6 +92,13 @@ export class YamprintFormatter implements FormatSpecifier {
         return !Number.isNaN(+ix) ? `(${ix}) ` : `'${ix}' `;
     }
 
+    function(f : Function){
+        let line = "function";
+        if (f.name) {
+            line += " " + f.name;
+        }
+        return `|${line}|`;
+    }
 
     threwAlert(err : any) {
         let line = "THREW";
@@ -78,19 +113,28 @@ export class YamprintFormatter implements FormatSpecifier {
             } else {
                 line += " Error";
             }
+
+            if (err.message) {
+                line += `("${err.message}")`;
+            }
         }
         return `‼ ${line} ‼`;
     }
     circular = "~Circular~";
     arrayPrefix = "► ";
     indent = "  ";
-
     number(n) {
         return n.toString();
     };
 
-    string(s) {
-        return `'${s}'`;
+    multilineMargin = "| ";
+
+    string(s : string) {
+        if (!s.match(/[(\r|\n)]/)) {
+            return `'${s}'`;
+        } else {
+            return s;
+        }
     }
 
     symbol(s) {
@@ -120,7 +164,6 @@ export class YamprintFormatter implements FormatSpecifier {
             return "[]";
         }
         return null;
-
     }
 
 
@@ -131,9 +174,10 @@ export class YamprintFormatter implements FormatSpecifier {
         if (value === undefined ){
             return this.undefined;
         }
-        if ([String, Number, Boolean, Symbol].some(ctor => value instanceof ctor)) {
+        if ([String, Number, Boolean, Symbol, Function].some(ctor => value instanceof ctor)) {
             value = value.valueOf();
         }
+
         switch (typeof value) {
             case "boolean":
                 return this.boolean(value);
@@ -143,7 +187,10 @@ export class YamprintFormatter implements FormatSpecifier {
                 return this.symbol(value);
             case "number":
                 return this.number(value);
+            case "function":
+                return this.function(value);
         }
+
         if (value instanceof Date) {
             return this.date(value);
         } else if (value instanceof RegExp) {

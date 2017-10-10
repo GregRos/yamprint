@@ -388,12 +388,20 @@ describe("automated tests", () => {
                 class B extends A {
                     b = 2;
                     bf() {}
+                    get d() {
+                        return 6;
+                    }
                 }
 
                 class C extends B {
                     c = 3;
                     cf() {}
+                    get d() {
+                        return 5;
+                    }
                 }
+
+
 
                 let x = new C();
 
@@ -404,6 +412,8 @@ describe("automated tests", () => {
                 expect(result).toMatch(/a.*1/);
                 expect(result).toMatch(/b.*2/);
                 expect(result).toMatch(/c.*3/);
+                expect(result).toMatch(/d.*5/);
+                expect(result).not.toMatch(/d.*6/);
                 expect(result).not.toMatch(/(bf|af|cf)/);
             })
         })
@@ -473,6 +483,16 @@ describe("automated tests", () => {
         arr : []
     };
 
+    class MeaningfulError extends Error {
+        get specialInfo() {
+            return 1235;
+        }
+
+        url = "http://www.google.com";
+
+        time = new Date();
+    }
+
     arrCircular.arr.push(arrCircular);
     arrCircular.arr.push(12355);
     let result = yp({
@@ -486,7 +506,15 @@ describe("automated tests", () => {
             date : new Date(),
             circular : circ,
             arrCircular : arrCircular,
+            multiLineText :
+`yamprint is yet another pretty-printing library, with output inspired by YAML syntax.
+yamprint stringifies objects into a convenient syntax that allows you to easily inspect their properties. 
+It is also highly customizable and supports printing many types of data.
+It also supports stuff like word wrapping and has a special format that allows it pretty-print text or other data spanning several lines.`,
             withPrototype : new function ProtoName() {
+
+            },
+            withAnonPrototype : new function() {
 
             },
             withPrototypeAndKeys : new function OtherProtoName() {
@@ -496,6 +524,7 @@ describe("automated tests", () => {
 
                 };
             },
+            error : new MeaningfulError("Blah!"),
             functionWithName: function nameOfFunction() {
 
             },
