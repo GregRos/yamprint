@@ -1,5 +1,4 @@
 
-import ww = require('wordwrap');
 export interface FormatSpecifier {
     propertyKey: (key: string) => string;
     constructorTag: (ctor: string) => string;

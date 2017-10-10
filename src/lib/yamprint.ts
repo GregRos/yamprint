@@ -2,7 +2,6 @@
 
 import {FormatSpecifier, YamprintFormatter, YamprintTheme} from "./yamprint-formatter";
 
-import ww = require('wordwrap');
 import {IndentedWriter} from "./indented-writer";
 
 class RecursivePrinter {
