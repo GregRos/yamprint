@@ -216,7 +216,7 @@ export const yamprint = function Yamprint(obj : any) {
      */
     create(preferences : YamprintFormatter) : Yamprinter;
 };
-yamprint.cr eate = create;
+yamprint.create = create;
 
 
 
