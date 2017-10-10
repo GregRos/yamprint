@@ -1,4 +1,5 @@
 
+
 # Yamprint
 [![build](https://travis-ci.org/GregRos/yamprint.svg?branch=master)](https://travis-ci.org/GregRos/yamprint)
 [![codecov](https://codecov.io/gh/GregRos/yamprint/branch/master/graph/badge.svg)](https://codecov.io/gh/GregRos/yamprint)
@@ -34,32 +35,53 @@ obj =
 Example color output using `yamprint-ansi-color` (requires compatible terminal emulator):
 ![](https://image.prntscr.com/image/KHZF_75WTH6zWJgwB-vXaQ.png)
 ## Usage
-Import the `yamprint` function:
-
+Import the `yamprint` function. This function is a default `Yamprinter` that lets you stringify objects:
 ```
 import {yamprint} from 'yamprint';
 ```
-
 You can stringify an object by:
-
 ```
 let string = yamprint({
 	example : 1
 });
 ```
-
-The yamprintter object 
-
+The `Yamprinter` function has a method `create` that lets you create another Yamprinter. You can supply a custom `YamprintFormatter` or `YamprintTheme` to this function in order to customize the output, including adding ANSI colors (see the screenshot above).
 ```
-let yp = yamprint.create({
-	//... options
-});
-
-let string = yp({example : 1});
+let yp = yamprint.create(new YamprintFormatter());
+let yp = yamprint.create(Themes.regular); //requires yamprint-ansi-color
 ```
 
-The custom printer function lets you customize the way values of different types and different parts of the syntax are formatted/printed.
+## Customizing the formatter
+Themes decorate the output of the `YamprintFormatter`. Basically, a theme is an object that has methods with the same names as the methods of the `YamprintFormatter`. When you theme a formatter, you map the output of every method in the formatter using the functions defined in the theme.
 
-1. `scalarFormatter` - for formatting values such as stirings, numbers, etc. When the printer encounters an object, it will try to use this object to format it. This object should be of the class `ScalarFormatter` (you can `extend` it).
-2. `keywordFormatter` -- an object of the type `KeywordFormatter`. Formats parts of syntax etc.
+In order to apply a theme on an existing formatter, call its `theme` method.
 
+If you want more control over the output than just decorating the output of the default formatter, you'll have to define a custom formatter by inheriting from the `YamprintFormatter` class itself.
+
+Here is an example of the regular ANSI color theme in the `yamprint-ansi-color` package. It makes use of the `chalk` package.
+
+	{
+        symbol: chalk.magenta,
+        regexp: chalk.hex('#6d872c'),
+        boolean: chalk.hex("#2A00E8"),
+        string: chalk.hex("#9b9b9b"),
+        number: chalk.hex("786CB0"),
+        date: chalk.blue,
+        nul : chalk.red,
+        undefined : chalk.red,
+        threwAlert: chalk.hex("#000000").bgHex("#FE4949"),
+        constructorTag: chalk.cyan,
+        propertyKey: chalk.bold.hex("#000000"),
+        sparseArrayIndex: chalk.blue,
+        function : chalk.underline.hex("#5255e1"),
+        circular: chalk.hex("#ffffff").bold.bgCyan
+    }
+
+## `yamprint-ansi-color`
+This additional package defines an ANSI color theme for `yamprint`. It defines a single export called `Theme` that has different themes. Right now the only theme is `regular`.
+
+This is how you use it:
+
+	import {yamprint} from 'yamprint';
+	import {Themes} from 'yamprint-ansi-color';
+	let yp = yamprint.create(Themes.regular);
