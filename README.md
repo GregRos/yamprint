@@ -1,9 +1,9 @@
 
 
 # Yamprint
-[![build](https://travis-ci.org/GregRos/yamprint.svg?branch=master)](https://travis-ci.org/GregRos/yamprint)
-[![codecov](https://codecov.io/gh/GregRos/yamprint/branch/master/graph/badge.svg)](https://codecov.io/gh/GregRos/yamprint)
-[![npm](https://badge.fury.io/js/yamprint.svg )](https://www.npmjs.com/package/yamprint)
+[![](https://travis-ci.org/GregRos/yamprint.svg?branch=master)](https://travis-ci.org/GregRos/yamprint)
+[![](https://codecov.io/gh/GregRos/yamprint/branch/master/graph/badge.svg)](https://codecov.io/gh/GregRos/yamprint)
+[![](https://badge.fury.io/js/yamprint.svg )](https://www.npmjs.com/package/yamprint)
 
 `yamprint` is yet another pretty-printing library, with output inspired by YAML syntax.
 
@@ -32,7 +32,7 @@ obj =
   thrownException = ‼ THREW EvenExceptionsAreOkay ‼
 ```
 
-Example color output using `yamprint-ansi-color` (requires compatible terminal emulator):
+Example color output using [`yamprint-ansi-color`]((https://github.com/GregRos/yamprint-ansi-color)) (requires compatible terminal emulator):
 ![](https://image.prntscr.com/image/KHZF_75WTH6zWJgwB-vXaQ.png)
 ## Usage
 Import the `yamprint` function. This function is a default `Yamprinter` that lets you stringify objects:
@@ -58,7 +58,7 @@ In order to apply a theme on an existing formatter, call its `theme` method.
 
 If you want more control over the output than just decorating the output of the default formatter, you'll have to define a custom formatter by inheriting from the `YamprintFormatter` class itself.
 
-Here is an example of the regular ANSI color theme in the `yamprint-ansi-color` package. It makes use of the `chalk` package.
+Here is an example of the regular ANSI color theme in the [`yamprint-ansi-color`](https://github.com/GregRos/yamprint-ansi-color) package. It makes use of the `chalk` package.
 
 	{
         symbol: chalk.magenta,
@@ -77,7 +77,7 @@ Here is an example of the regular ANSI color theme in the `yamprint-ansi-color` 
         circular: chalk.hex("#ffffff").bold.bgCyan
     }
 
-## `yamprint-ansi-color`
+## [`yamprint-ansi-color`](https://github.com/GregRos/yamprint-ansi-color)
 This additional package defines an ANSI color theme for `yamprint`. It defines a single export called `Theme` that has different themes. Right now the only theme is `regular`.
 
 This is how you use it:
