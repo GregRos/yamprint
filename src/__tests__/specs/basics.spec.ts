@@ -133,15 +133,6 @@ describe("automated tests", () => {
             printNext(result);
         });
 
-        it("array turned object", () => {
-            let arr = [1, 5, 10];
-            arr["a"] = 20;
-            let result = yp(arr);
-            printNext(result);
-            expect(result).toMatch(/a.*20/);
-
-        });
-
         it("object with number keys", () => {
             let o = {
                 1 : "a",
