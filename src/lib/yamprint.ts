@@ -56,7 +56,7 @@ yamprint.defaults = {
     formatter : new YamprintFormatter(),
     rules : {
         propertyFilter : (prop) => {
-            return ["constructor", "arguments"].indexOf(prop.name) < 0 && !prop.name.startsWith("__") && !(prop.descriptor.value instanceof Function && prop.objectDepth > 0)
+            return ["constructor", "arguments", "prototype"].indexOf(prop.name) < 0 && !prop.name.startsWith("__") && !(prop.descriptor.value instanceof Function && prop.objectDepth > 0)
         },
         maxDepth : 10,
         maxObjectLength : 100,

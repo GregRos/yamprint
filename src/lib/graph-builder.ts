@@ -35,7 +35,15 @@ export class YamprintGraphBuilder {
 
     }
 
-    private _tryScalar(value : any) {
+    /**
+     * Takes an object and tries to identify it as a scalar. Returns a `Node` (could be a literal) if it was successful, or `null` if not.
+     *
+     * If you want to add more scalar types, you should do it here.
+     * @param value
+     * @returns {Node}
+     * @private
+     */
+    protected _tryBuildScalar(value : any) {
         if (value == null) return value;
         if ([String, Number, Boolean, Symbol, Function].some(ctor => value instanceof ctor)) {
             value = value.valueOf();
@@ -57,7 +65,7 @@ export class YamprintGraphBuilder {
         return notScalar;
     }
 
-    private _readObjectProprties(instance : object) {
+    protected _readObjectProprties(instance : object) {
         if (this._rules.maxDepth <= this._currentDepth) {
             return new EmptyObjectScalar(this._rules.getConstructor(instance)).withMetadata({
                 depthExceeded : true
@@ -126,7 +134,7 @@ export class YamprintGraphBuilder {
         });
     }
 
-    private _readArray(value : Array<any>) {
+    protected _readArray(value : Array<any>) {
         let lastIndex = -1;
         let isSparse = value.some((x, index) => {
             if (index !== lastIndex + 1) return true;
@@ -170,10 +178,10 @@ export class YamprintGraphBuilder {
         }
     }
 
-    private _toGraph(instance : any) {
+    protected _toGraph(instance : any) {
         this._currentDepth++;
         let result : any;
-        let scalar = this._tryScalar(instance);
+        let scalar = this._tryBuildScalar(instance);
         if (scalar !== notScalar) {
             result = scalar;
         } else if (this._knownNodes.has(instance)) {

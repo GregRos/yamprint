@@ -11,7 +11,7 @@ export class YamprintGraphPrinter {
     constructor(private _formatter : YamprintFormatter) {
         this._writer = new IndentedWriter(_formatter.indent);
     }
-    private _formatLiteral(literal : any) {
+    protected _formatLiteral(literal : any) {
         if (literal === null) return this._formatter.nul;
         if (literal === undefined) return this._formatter.undefined;
         switch (typeof literal) {
@@ -35,7 +35,7 @@ export class YamprintGraphPrinter {
         }
     }
 
-    private _printArray(instance : ArrayNode) {
+    protected _printArray(instance : ArrayNode) {
         if (instance.metadata.depthExceeded) {
             this._writer.writeLine(this._formatter.arrayDepthExceeded);
             return;
@@ -58,7 +58,7 @@ export class YamprintGraphPrinter {
         }
     }
 
-    private _printSparseArray(node : SparseArrayNode) {
+    protected _printSparseArray(node : SparseArrayNode) {
         let lines = [];
         for (let item of node.items) {
             let result = this._formatScalar(item.value);
@@ -76,7 +76,7 @@ export class YamprintGraphPrinter {
         }
     }
 
-    private _formatScalar(scalar : any) {
+    protected _formatScalar(scalar : any) {
         if (scalar instanceof NodeBase) {
             if (scalar instanceof BinaryScalar) {
                 return this._formatter.binary(scalar);
@@ -97,11 +97,11 @@ export class YamprintGraphPrinter {
         }
     }
 
-    private _printTextBlock(block : TextBlockScalar) {
+    protected _printTextBlock(block : TextBlockScalar) {
         return this._formatter.textBlock(block);
     }
 
-    private _printObject(node : ObjectNode) {
+    protected _printObject(node : ObjectNode) {
         if (node.metadata.depthExceeded) {
             this._writer.writeLine(this._formatter.objectDepthExceeded(node.ctor));
             return;
@@ -125,7 +125,7 @@ export class YamprintGraphPrinter {
         }
     }
 
-    private _printComplex(node : Node) {
+    protected _printComplex(node : Node) {
         if (node instanceof ObjectNode) {
             this._printObject(node);
         } else if (node instanceof ArrayNode) {
