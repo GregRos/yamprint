@@ -13,7 +13,10 @@ export module BinaryTypeIdentifier {
     let constructors = {
         Blob: typeof Blob === "undefined" ? null : Blob,
         ArrayBuffer: typeof ArrayBuffer === "undefined" ? null : ArrayBuffer,
-        ArrayBufferView: typeof ArrayBufferView === "undefined" ? null : ArrayBufferView,
+        ArrayBufferView: typeof Uint8Array === "undefined" ? null : (function() {
+            let typedArrayProto = Object.getPrototypeOf(Uint8Array.prototype);
+            return typedArrayProto.constructor;
+        })(),
         Buffer: typeof Buffer === "undefined" ? null : Buffer
     };
 
@@ -25,11 +28,13 @@ export module BinaryTypeIdentifier {
     };
 
     export function getBinaryTypeInfo(binary: any) : BinaryTypeInfo | null {
+        if (!binary) return null;
+        let myCtor = binary.constructor;
         for (let k of Object.keys(constructors)) {
             let ctor = constructors[k];
             if (ctor && binary instanceof ctor) {
                 let size = measures[k](binary);
-                return new BinaryScalar(ctor.name, size);
+                return new BinaryScalar(myCtor && myCtor.name || k, size);
             }
         }
         return null;

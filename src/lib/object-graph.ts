@@ -54,7 +54,7 @@ export class EmptyArrayScalar extends NodeBase {
 }
 
 export class UnresolvedGetterScalar extends NodeBase {
-    constructor(public readonly func: Function) {
+    constructor() {
         super();
     }
 }

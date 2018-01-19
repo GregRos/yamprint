@@ -2,7 +2,7 @@ import {
     ArrayNode, BinaryScalar, CircularReferenceScalar, DepthExceededScalar, EmptyArrayScalar, EmptyObjectScalar, Node,
     NodeBase, ObjectNode,
     PropertyItem,
-    SparseArrayNode, TextBlockScalar, ThrewErrorScalar
+    SparseArrayNode, TextBlockScalar, ThrewErrorScalar, UnresolvedGetterScalar
 } from "./object-graph";
 import {BinaryTypeIdentifier} from "./binary-type-identifier";
 
@@ -28,7 +28,7 @@ const circularReferenceScalar = new CircularReferenceScalar();
 const emptyArrayScalar = new EmptyArrayScalar();
 const notScalar = {};
 
-export class RecursiveGraphBuilder {
+export class YamprintGraphBuilder {
     private _knownNodes = new Set<any>();
     private _currentDepth = -1;
     constructor(private _rules : GraphBuilderRules){
@@ -105,6 +105,12 @@ export class RecursiveGraphBuilder {
         for (let [name, property] of allProperties) {
             let result = this._rules.propertyFilter(property);
             if (!result) continue;
+            if (property.descriptor.get && !this._rules.resolveGetters) {
+                properties.push({
+                    name : name,
+                    value : new UnresolvedGetterScalar()
+                })
+            }
             else if (result === true) {
                 properties.push({
                     name: name,

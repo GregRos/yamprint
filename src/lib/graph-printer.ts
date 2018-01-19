@@ -6,7 +6,7 @@ import {YamprintFormatter} from "./yamprint-formatter";
 import {IndentedWriter} from "./indented-writer";
 
 
-export class GraphPrinter {
+export class YamprintGraphPrinter {
     private _writer : IndentedWriter;
     constructor(private _formatter : YamprintFormatter) {
         this._writer = new IndentedWriter(_formatter.indent);
