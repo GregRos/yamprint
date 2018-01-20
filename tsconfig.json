@@ -10,7 +10,8 @@
     "target": "ES6",
     "lib": ["es6"],
     "allowUnreachableCode": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "outDir": "dist"
   },
   "exclude": [ "node_modules"]
 }

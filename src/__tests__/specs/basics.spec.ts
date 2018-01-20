@@ -1,5 +1,6 @@
 import {yamprint} from "../../lib/yamprint";
 import chalk = require('chalk');
+import * as _ from "lodash";
 
 function sparseArray(...pairs : [any, any][]) : any[] {
     let arr = [];
@@ -542,6 +543,29 @@ It also supports stuff like word wrapping and has a special format that allows i
 
     console.log(result);
 
-    it("", () => {
+    describe("big objects", () => {
+        let yp = yamprint.create({
+            rules : {
+                maxDepth : 3,
+                maxObjectLength : 10
+            }
+        });
+        let wideObject = {};
+        it("trims an object with over 10 properties", () => {
+            _.range(0, 13).forEach(n => {
+                wideObject["x" + n] = "prop" + n;
+            });
+            let result = yp(wideObject);
+            printNext(result);
+            expect(result).toMatch(/size exceeded/);
+            expect(result).not.toMatch(/x12/);
+        });
+        it("trims an array with over 10 items", () => {
+            let arr = _.range(0, 13);
+            let result = yp(arr);
+            printNext(result);
+            expect(result).toMatch(/size exceeded/);
+            expect(result).not.toMatch(/12/);
+        });
     });
 });
