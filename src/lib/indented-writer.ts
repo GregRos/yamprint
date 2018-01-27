@@ -8,7 +8,7 @@ export class IndentedWriter {
     }
     write(str: string) {
         if (this._needsIndent) {
-            str = "\n" + this._indentStr.repeat(this._depth) + str;
+            str = `\n${this._indentStr.repeat(this._depth)}${str}`;
             this._needsIndent = false;
         }
         this._inner += str;

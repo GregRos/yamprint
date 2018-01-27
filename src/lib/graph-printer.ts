@@ -8,28 +8,28 @@ import {IndentedWriter} from "./indented-writer";
 
 export class YamprintGraphPrinter {
     private _writer : IndentedWriter;
-    constructor(private _formatter : YamprintFormatter) {
-        this._writer = new IndentedWriter(_formatter.indent);
+    constructor(public readonly formatter : YamprintFormatter) {
+        this._writer = new IndentedWriter(formatter.indent);
     }
     protected _formatLiteral(literal : any) {
-        if (literal === null) return this._formatter.nul;
-        if (literal === undefined) return this._formatter.undefined;
+        if (literal === null) return this.formatter.null;
+        if (literal === undefined) return this.formatter.undefined;
         switch (typeof literal) {
             case "boolean":
-                return this._formatter.boolean(literal);
+                return this.formatter.boolean(literal);
             case "string":
-                return this._formatter.string(literal);
+                return this.formatter.string(literal);
             case "symbol":
-                return this._formatter.symbol(literal);
+                return this.formatter.symbol(literal);
             case "number":
-                return this._formatter.number(literal);
+                return this.formatter.number(literal);
             case "function":
-                return this._formatter.function(literal);
+                return this.formatter.function(literal);
         }
         if (literal instanceof Date) {
-            return this._formatter.date(literal);
+            return this.formatter.date(literal);
         } else if (literal instanceof RegExp) {
-            return this._formatter.regexp(literal);
+            return this.formatter.regexp(literal);
         } else {
             return null;
         }
@@ -37,13 +37,13 @@ export class YamprintGraphPrinter {
 
     protected _printArray(instance : ArrayNode) {
         if (instance.metadata.depthExceeded) {
-            this._writer.writeLine(this._formatter.arrayDepthExceeded);
+            this._writer.writeLine(this.formatter.arrayDepthExceeded);
             return;
         }
         let lines = [];
         for (let item of instance.items) {
             let result = this._formatScalar(item);
-            this._writer.write(this._formatter.arrayPrefix);
+            this._writer.write(this.formatter.arrayPrefix);
             if (result != null) {
                 this._writer.writeLine(result);
             } else {
@@ -54,7 +54,7 @@ export class YamprintGraphPrinter {
         }
 
         if (instance.metadata.sizeExceeded) {
-            this._writer.writeLine(this._formatter.sizeExceededToken);
+            this._writer.writeLine(this.formatter.sizeExceededToken);
         }
     }
 
@@ -62,7 +62,7 @@ export class YamprintGraphPrinter {
         let lines = [];
         for (let item of node.items) {
             let result = this._formatScalar(item.value);
-            this._writer.write(`(${item.name}) ${this._formatter.arrayPrefix}`);
+            this._writer.write(`(${item.name}) ${this.formatter.arrayPrefix}`);
             if (result != null) {
                 this._writer.writeLine(result);
             } else {
@@ -72,24 +72,24 @@ export class YamprintGraphPrinter {
             }
         }
         if (node.metadata.sizeExceeded) {
-            this._writer.writeLine(this._formatter.sizeExceededToken);
+            this._writer.writeLine(this.formatter.sizeExceededToken);
         }
     }
 
     protected _formatScalar(scalar : any) {
         if (scalar instanceof NodeBase) {
             if (scalar instanceof BinaryScalar) {
-                return this._formatter.binary(scalar);
+                return this.formatter.binary(scalar);
             } else if (scalar instanceof CircularReferenceScalar) {
-                return this._formatter.circularReference;
+                return this.formatter.circularReference;
             } else if (scalar instanceof EmptyArrayScalar) {
-                return this._formatter.emptyArray;
+                return this.formatter.emptyArray;
             } else if (scalar instanceof EmptyObjectScalar) {
-                return this._formatter.emptyObject(scalar.ctor);
+                return this.formatter.emptyObject(scalar.ctor, scalar.metadata);
             } else if (scalar instanceof UnresolvedGetterScalar) {
-                return this._formatter.unreoslvedGetter;
+                return this.formatter.unreoslvedGetter;
             } else if (scalar instanceof ThrewErrorScalar) {
-                return this._formatter.threwAlert(scalar.error);
+                return this.formatter.threwAlert(scalar.error);
             }
         }
         else {
@@ -98,19 +98,15 @@ export class YamprintGraphPrinter {
     }
 
     protected _printTextBlock(block : TextBlockScalar) {
-        return this._formatter.textBlock(block);
+        return this.formatter.textBlock(block);
     }
 
     protected _printObject(node : ObjectNode) {
-        if (node.metadata.depthExceeded) {
-            this._writer.writeLine(this._formatter.objectDepthExceeded(node.ctor));
-            return;
-        }
-        let tag = this._formatter.constructorTag(node.ctor);
+        let tag = this.formatter.constructorTag(node.ctor);
         if (tag) this._writer.writeLine(tag);
         for (let property of node.properties) {
             let tryScalar = this._formatScalar(property.value);
-            let name = this._formatter.propertyKey(property.name);
+            let name = this.formatter.propertyKey(property.name);
             if (tryScalar != null) {
                 this._writer.writeLine(`${name}${tryScalar}`)
             } else {
@@ -121,7 +117,7 @@ export class YamprintGraphPrinter {
             }
         }
         if (node.metadata.sizeExceeded) {
-            this._writer.writeLine(this._formatter.sizeExceededToken);
+            this._writer.writeLine(this.formatter.sizeExceededToken);
         }
     }
 

@@ -1,8 +1,9 @@
 import {yamprint} from "../../lib/yamprint";
-import chalk = require('chalk');
+import chalk = require("chalk");
 import * as _ from "lodash";
 
-function sparseArray(...pairs : [any, any][]) : any[] {
+/*tslint:disable no-construct */
+function sparseArray(...pairs: [any, any][]): any[] {
     let arr = [];
     for (let [index, value] of pairs) {
         arr[index] = value;
@@ -12,20 +13,20 @@ function sparseArray(...pairs : [any, any][]) : any[] {
 
 describe("automated tests", () => {
 
-    let _printNext = "";
+    let printNextToken = "";
     beforeEach(() => {
-        if (_printNext) {
-            _printNext = "▌ " + _printNext.replace(/\n/gi, "\n▌ ");
-            console.info(chalk.gray(_printNext));
-            _printNext = "";
+        if (printNextToken) {
+            printNextToken = `▌ ${printNextToken.replace(/\n/gi, "\n▌ ")}`;
+            console.info(chalk.gray(printNextToken));
+            printNextToken = "";
         }
     });
 
     let printNext = v => {
-        _printNext = v;
-        _printNext = "\n▌ " + _printNext.replace(/\n/gi, "\n▌ ");
-        console.info(chalk.gray(_printNext));
-        _printNext = "";
+        printNextToken = v;
+        printNextToken = `\n▌ ${printNextToken.replace(/\n/gi, "\n▌ ")}`;
+        console.info(chalk.gray(printNextToken));
+        printNextToken = "";
     };
     describe("construct", () => {
         it("basic construct", () => {
@@ -33,7 +34,7 @@ describe("automated tests", () => {
         });
     });
 
-    let yp = yamprint.create();
+    let yp = yamprint.extend();
 
     describe("edge cases", () => {
         describe("circular ref", () => {
@@ -96,6 +97,7 @@ describe("automated tests", () => {
         });
 
         describe("scalar wrappers", () => {
+
             it("number", () => {
                 let actual = yp(new Number(5));
                 expect(actual).toBe("5");
@@ -117,7 +119,7 @@ describe("automated tests", () => {
         });
 
         it("nameless ctor prototype", () => {
-            let x = new function() {
+            let x = new function () {
                 this.x = 5;
             };
             let result = yp(x);
@@ -136,8 +138,8 @@ describe("automated tests", () => {
 
         it("object with number keys", () => {
             let o = {
-                1 : "a",
-                2 : "b"
+                1: "a",
+                2: "b"
             };
             let result = yp(o);
             printNext(result);
@@ -146,8 +148,8 @@ describe("automated tests", () => {
 
         it("ignore symbol keys", () => {
             let o = {
-                x : 12,
-                [Symbol.for("y")] : 34
+                x: 12,
+                [Symbol.for("y")]: 34
             };
             let result = yp(o);
             expect(result).toMatch(/x.*12/);
@@ -192,6 +194,7 @@ describe("automated tests", () => {
             class MyError extends Error {
 
             }
+
             let result = yp(new MyError("something"));
             printNext(result);
         })
@@ -293,13 +296,13 @@ describe("automated tests", () => {
                                 c: 5
                             }
                         ],
-                        d : 6
+                        d: 6
                     },
                     {
-                        e : 11
+                        e: 11
                     }
                 ],
-                e : 7
+                e: 7
             });
 
             printNext(result);
@@ -316,16 +319,16 @@ describe("automated tests", () => {
             }
 
             it("simple protype tag", () => {
-                let x = new SimpleProto({a : 1});
+                let x = new SimpleProto({a: 1});
                 let result = yp(x);
                 expect(result).toMatch(/SimpleProto[\s\S]*a[\s\S]*1/);
                 printNext(result);
             });
 
             it("nested prototype tag", () => {
-                let x = new SimpleProto({b : 1});
+                let x = new SimpleProto({b: 1});
                 let result = yp({
-                    a : x
+                    a: x
                 });
                 expect(result).toMatch(/[\s\S]*a[\s\S]*SimpleProto[\s\S]*b[\s\S]*1/);
                 printNext(result);
@@ -334,16 +337,16 @@ describe("automated tests", () => {
             it("nested just prototype", () => {
                 let x = new SimpleProto({});
                 let result = yp({
-                    a : x
+                    a: x
                 });
                 expect(result).toMatch(/[\s\S]*a[\s\S]*SimpleProto/);
                 printNext(result);
             });
 
             it("proto tag in array", () => {
-                let x = [1, 2, 3].map(n => new SimpleProto({v : n}));
+                let x = [1, 2, 3].map(n => new SimpleProto({v: n}));
                 let result = yp({
-                    a : x
+                    a: x
                 });
                 expect(result).toMatch(/([\s\S]*SimpleProto[\s\S]*v[\s\S]*\d){3}/);
                 printNext(result);
@@ -351,16 +354,19 @@ describe("automated tests", () => {
 
             it("props in prototypes", () => {
                 let a = {
-                    a : 1,
-                    af : function() {}
+                    a: 1,
+                    af: function () {
+                    }
                 };
                 let b = Object.assign(Object.create(a), {
-                    b : 2,
-                    bf : function() {}
+                    b: 2,
+                    bf: function () {
+                    }
                 });
                 let c = b = Object.assign(Object.create(b), {
-                    c : 3,
-                    cf : function cf() {}
+                    c: 3,
+                    cf: function cf() {
+                    }
                 } as any);
                 let result = yp(c);
                 printNext(result);
@@ -374,12 +380,17 @@ describe("automated tests", () => {
             it("props in prototypes with classes", () => {
                 class A {
                     a = 1;
-                    af() {}
+
+                    af() {
+                    }
                 }
 
                 class B extends A {
                     b = 2;
-                    bf() {}
+
+                    bf() {
+                    }
+
                     get d() {
                         return 6;
                     }
@@ -387,12 +398,14 @@ describe("automated tests", () => {
 
                 class C extends B {
                     c = 3;
-                    cf() {}
+
+                    cf() {
+                    }
+
                     get d() {
                         return 5;
                     }
                 }
-
 
 
                 let x = new C();
@@ -414,7 +427,9 @@ describe("automated tests", () => {
     describe("getter/setters", () => {
         it("object with getter only", () => {
             let o = {
-                get a() {return 1}
+                get a() {
+                    return 1
+                }
             };
             let result = yp(o);
             printNext(result);
@@ -423,14 +438,13 @@ describe("automated tests", () => {
         });
 
         it("object with setter only", () => {
-            let o = {
-            };
+            let o = {};
             Object.defineProperty(o, "setter_only", {
                 set(v) {
 
                 },
-                enumerable : true,
-                configurable : true
+                enumerable: true,
+                configurable: true
             });
             o["setter_only"] = "a";
             let result = yp(o);
@@ -442,12 +456,13 @@ describe("automated tests", () => {
 
         it("getter throws exception", () => {
             class SpecialError extends Error {
-                get name(){
+                get name() {
                     return "SpecialError";
                 }
             }
+
             let o = {
-                a : {
+                a: {
                     get blah() {
                         throw new SpecialError();
                     }
@@ -465,14 +480,15 @@ describe("automated tests", () => {
             return this.constructor.name;
         }
     }
+
     let circ = {
-        a : null
+        a: null
     };
 
     circ.a = circ;
 
     let arrCircular = {
-        arr : []
+        arr: []
     };
 
     class MeaningfulError extends Error {
@@ -494,29 +510,27 @@ describe("automated tests", () => {
             boolean: false,
             etc1: null,
             etc2: undefined,
-            regexp : /(abc)+/,
-            date : new Date(),
-            circular : circ,
-            arrCircular : arrCircular,
-            multiLineText :
-`yamprint is yet another pretty-printing library, with output inspired by YAML syntax.
+            regexp: /(abc)+/,
+            date: new Date(),
+            circular: circ,
+            arrCircular: arrCircular,
+            multiLineText:
+                `yamprint is yet another pretty-printing library, with output inspired by YAML syntax.
 yamprint stringifies objects into a convenient syntax that allows you to easily inspect their properties. 
 It is also highly customizable and supports printing many types of data.
 It also supports stuff like word wrapping and has a special format that allows it pretty-print text or other data spanning several lines.`,
-            withPrototype : new function ProtoName() {
+            withPrototype: new function ProtoName() {
 
             },
-            withAnonPrototype : new function() {
+            withAnonPrototype: new function () {
 
             },
-            withPrototypeAndKeys : new function OtherProtoName() {
+            withPrototypeAndKeys: new function OtherProtoName() {
                 this.a = 2345;
                 this.b = [];
-                this.c = {
-
-                };
+                this.c = {};
             },
-            error : new MeaningfulError("Blah!"),
+            error: new MeaningfulError("Blah!"),
             functionWithName: function nameOfFunction() {
 
             },
@@ -536,7 +550,7 @@ It also supports stuff like word wrapping and has a special format that allows i
             get thrownException() {
                 throw new Error("asdf")
             },
-            sparseArray : sparseArray([1, "sparse"], [10, "array"], [5000, "with indexes and"], ["string", "keys"])
+            sparseArray: sparseArray([1, "sparse"], [10, "array"], [5000, "with indexes and"], ["string", "keys"])
         },
 
     });
@@ -544,28 +558,89 @@ It also supports stuff like word wrapping and has a special format that allows i
     console.log(result);
 
     describe("big objects", () => {
-        let yp = yamprint.create({
-            rules : {
-                maxDepth : 3,
-                maxObjectLength : 10
-            }
+        let yp = yamprint.extend({
+            maxDepth: 3,
+            maxObjectLength: 10
         });
-        let wideObject = {};
-        it("trims an object with over 10 properties", () => {
-            _.range(0, 13).forEach(n => {
-                wideObject["x" + n] = "prop" + n;
+
+        let getArr = () => {
+            let arr = _.range(0, 13);
+            return arr;
+        };
+
+        let getObj = (prefix, num) => {
+            let wideObject = {};
+            _.range(0, num).forEach(n => {
+                wideObject[prefix + n] = `prop${n}`;
             });
+            return wideObject;
+        };
+
+        it("trims an object with over 10 properties", () => {
+            let wideObject = getObj("x", 13);
             let result = yp(wideObject);
             printNext(result);
             expect(result).toMatch(/size exceeded/);
-            expect(result).not.toMatch(/x12/);
+            expect(result).not.toMatch(/x10/);
         });
         it("trims an array with over 10 items", () => {
-            let arr = _.range(0, 13);
+            let arr = getArr();
             let result = yp(arr);
             printNext(result);
             expect(result).toMatch(/size exceeded/);
-            expect(result).not.toMatch(/12/);
+            expect(result).not.toMatch(/10/);
         });
+        it("trims an array with 10 items at level 2", () => {
+            let obj = {
+                inner: {
+                    arr: getArr()
+                }
+            };
+            let result = yp(obj);
+            printNext(result);
+            expect(result).toMatch("inner");
+            expect(result).toMatch("size exceeded");
+            expect(result).not.toMatch("10");
+        });
+        it("doesn't count excluded properties.", () => {
+            let yp2 = yp.extend(options => {
+                return {
+                    propertyFilter: prop => options.propertyFilter(prop) && !prop.name.startsWith("$")
+                }
+            });
+            let obj = {
+                inner: {
+                    obj: {
+                        ...getObj("$x", 10),
+                        a1: 2,
+                        a2: 3,
+                        a3: 4
+                    }
+                }
+            };
+            let result = yp2(obj);
+            printNext(result);
+            expect(result).not.toContain("$");
+            expect(result).not.toContain("size exceeded");
+            expect(result).not.toContain("10");
+        });
+
+        it("stops at the 3rd level", () => {
+            let obj = {
+                a0: {
+                    a1: {
+                        a2: {
+                            a3: "nope"
+                        }
+                    }
+                }
+            };
+            let result = yp(obj);
+            printNext(result);
+            expect(result).not.toContain("nope");
+            expect(result).toContain("a2");
+            expect(result).not.toContain("a3");
+        })
+
     });
 });

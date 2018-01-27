@@ -44,24 +44,17 @@ Import the `yamprint` function. This function is a default `Yamprinter` that let
 ```
 import {yamprint} from 'yamprint';
 ```
-You can stringify an object by call this as a function:
+You can stringify an object by calling it:
 ```
 let string = yamprint({
     example : 1
 });
 ```
-The `yamprint` function has a method `create` that lets you create another `Yamprinter`. This accepts an `options` object as follows. Both of these (and the object) are optional:
 
-    let yp = yamprint.create({
-        formatter : new YamprintFormatter(), //a YamprintFormatter or a YamprintTheme
-        rules : {
-            //all kinds of rules that tell the yamprint how to print an object
-        }
-    });
-```
-let yp = yamprint.create({formatter : new YamprintFormatter()});
-let yp = yamprint.create({formatter : Themes.regular}); //requires yamprint-ansi-color
-```
+Yamprinters can be configured. Every `Yamprinter`, including the default one, has a method called `extend` that lets you make another `Yamprinter` based on the previous one. This works by either:
+
+1. Giving it a `YamprintOptions` object, in which case these options override the options of the previous object.
+2. Giving it a function that takes the old options and returns a new set of options. Again, if a partial object is returned, it's unified with the old options.
 
 ## Customization
 The library supports several levels of customization, depending on how far you want to go. Also, the code that traverses and object and the code that prints it are totally separate.
@@ -69,7 +62,7 @@ The library supports several levels of customization, depending on how far you w
 ### Simple stuff
 
 #### Basics
-Yamprint uses a plug-in object called a `Formatter` which is separate from the rest of the code. This object generates certain kinds of texts, such as:
+Yamprint uses a pluggable object called a `Formatter` which is separate from the rest of the code. This object generates certain kinds of texts, such as:
 
 1. The text for property keys, array prefixes bullet points, scalar values like numbers.
 2. The tag at the head of an object specifying its constructor.
@@ -80,7 +73,7 @@ You can take the existing formatter and extend it through inheritance, but you c
 
 They're mostly meant to allow coloring using ANSI styling and things like that. Here is an example of a theme. `chalk` is a package for ANSI styling. Every expression like `chalk.magenta` is a function that  takes in a plain string and returns a styled string.
 
-    {
+    let ansiColorTheme = {
         symbol: chalk.magenta,
         regexp: chalk.hex('#6d872c'),
         boolean: chalk.hex("#2A00E8"),
@@ -97,6 +90,19 @@ They're mostly meant to allow coloring using ANSI styling and things like that. 
         circular: chalk.hex("#ffffff").bold.bgCyan
     }
 
+You apply a theme either by calling the `.theme` method  of an existing formatter (e.g. the one in the options of a `Yamprinter`) or passing a theme *instead* of a formatter, in which case it's automatically applied to the formatter of the previous `Yamprinter`.
+    
+    //option 1, the theme will automatically be applied
+    let themedYamprinter1 = yamprint.extend({formatter : ansiColorTheme});
+
+    //option 2, theme an existing formatter via the method:
+    let themedYamprinter2 = yamprint.extend(oldOptions => {
+        return {
+            formatter : oldOptions.formatter.theme(ansiColorTheme)
+        }
+    });
+
+
 ####  Rules
 When you create a custom `Yamprinter`, you can give it a `YamprintRules` object. It contains some rules about how objects should be traversed. These rules don't change *how* things are printed, but instead *what* things are printed.
 
@@ -105,6 +111,31 @@ The rules are meant to be pretty simple and allow for the most common kinds of c
 1. Ignore certain properties entirely, based on name, descriptor, and defining prototype.
 2. Don't explore certain prototypes entirely, like `Object`.
 3. Set limits about how deep you should go, how big an object can be, etc.
+
+The default `Yamprinter` is initialized with a set of default rules that should apply to most situations.
+
+You pass the rules when you're extending a `Yamprinter`, like this:
+
+    //provide an options object that overrides some of the rules:
+    let yp1 = yamprint.extend({
+        rules : {
+            maxObjectDepth : 3
+        }
+    });
+
+    let yp2 = yamprint.extend(oldOptions => {
+        return {
+            rules : {
+                propertyFilter(propInfo) {
+                    //here we delegate to the regular filter, but also filter out
+                    //a specific property
+                    return oldOptions.propertyFilter(propInfo)
+                        && propInfo.name !== "myCustomProperty"
+                }
+            }
+        }
+    });
+    
 
 ### More advanced stuff
 If those things aren't enough, you can dig deeper into the library!

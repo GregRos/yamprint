@@ -1,39 +1,48 @@
 import {BinaryTypeInfo} from "./binary-type-identifier";
-import {BinaryScalar, TextBlockScalar} from "./object-graph";
+import {BinaryScalar, NodeMetadata, PropertyItem, TextBlockScalar} from "./object-graph";
 
 export interface FormatSpecifier {
-    propertyKey: (key: string) => string;
-    constructorTag: (ctor: string) => string;
+    propertyKey(key: string): string;
+
+    constructorTag(ctor: string): string;
+
     arrayPrefix: string
     indent: string;
-    threwAlert: (error: any) => string;
-    sparseArrayIndex: (index: number | string) => string;
+
+    threwAlert(error: any): string;
+
+    sparseArrayPrefix(index: string): string;
+
     circularReference: string;
-    multilineMargin: string;
-    number: (num: number) => string;
-    string: (str: string) => string;
-    symbol: (sym: Symbol) => string;
-    boolean: (bool: boolean) => string;
-    date: (date: Date) => string;
-    regexp: (regexp: RegExp) => string;
-    nul: string;
+
+    number(num: number): string;
+
+    string(str: string): string;
+
+    symbol(sym: Symbol): string;
+
+    boolean(bool: boolean): string;
+
+    date(date: Date): string;
+
+    regexp(regexp: RegExp): string;
+
+    null: string;
     undefined: string;
     arrayDepthExceeded: string;
     sizeExceededToken: string;
     unreoslvedGetter: string;
 
-    emptyObject(ctor: Function): any;
+    emptyObject(ctor: Function, metadata : NodeMetadata): any;
 
     binary({name, size}: BinaryScalar): string;
-
-    objectDepthExceeded(obj: object): string;
 
     textBlock({lines}: TextBlockScalar): string[];
 }
 
 export type YamprintTheme = {
     [K in keyof FormatSpecifier] ?: (s: string) => string;
-}
+    }
 
 declare let Blob, ArrayBuffer, ArrayBufferView;
 
@@ -43,10 +52,18 @@ export class YamprintFormatter implements FormatSpecifier {
         return line && `|${line}|` || "";
     }
 
-    emptyObject(ctor: Function) {
-        if (ctor === Object) return "{}";
-        if (!ctor || !ctor.name) return this._formatCtorTag("~anonymous~");
-        return this.constructorTag(ctor);
+    emptyObject(ctor: Function, metadata: NodeMetadata) {
+        let str = "";
+        if (metadata && metadata.depthExceeded) {
+            if (ctor === Object) str = "{...}";
+            else if (!ctor || !ctor.name) str = this._formatCtorTag("{|~anonymous~|}");
+            else str = `{${this.constructorTag(ctor)}}`;
+        } else {
+            if (ctor === Object) str = "{}";
+            else if (!ctor || !ctor.name) str = this._formatCtorTag("~anonymous~");
+            else str = this.constructorTag(ctor);
+        }
+        return `${str} (depth exceeded)`;
     }
 
     propertyKey(key: string) {
@@ -61,7 +78,7 @@ export class YamprintFormatter implements FormatSpecifier {
             constructor(colors: YamprintTheme) {
                 super();
                 Object.keys(colors).forEach(k => {
-                    if (typeof this[k] == "function") {
+                    if (typeof this[k] === "function") {
                         this[k] = function (...args: any[]) {
                             return colors[k].call(colors, self[k].apply(this, args));
                         };
@@ -98,14 +115,16 @@ export class YamprintFormatter implements FormatSpecifier {
         return this._formatCtorTag(line);
     };
 
-    sparseArrayIndex(ix: number | string) {
-        return !Number.isNaN(+ix) ? `(${ix}) ` : `'${ix}' `;
-    }
+    arrayPrefix = `► `
+
+    sparseArrayPrefix(index : string) {
+        return `(${index}) ► `
+    };
 
     function (f: Function) {
         let line = "function";
         if (f.name) {
-            line += " " + f.name;
+            line += ` ${f.name}`;
         }
         return `|${line}|`;
     }
@@ -118,11 +137,11 @@ export class YamprintFormatter implements FormatSpecifier {
     threwAlert(err: any) {
         let line = "THREW";
         if (!(err instanceof Error)) {
-            line += " " + (err && err.toString || Object.prototype.toString).call(err);
+            line += ` ${(err && err.toString || Object.prototype.toString).call(err)}`;
         }
         else {
             if (err.name) {
-                line += " " + err.name;
+                line += ` ${err.name}`;
             } else if (err.constructor && err.constructor.name) {
                 line += `${err.constructor.name}`;
             } else {
@@ -140,26 +159,25 @@ export class YamprintFormatter implements FormatSpecifier {
     emptyArray = "[]";
     arrayDepthExceeded = "[...] (depth exceeded)";
 
-    objectDepthExceeded(obj: Function) {
-        return this.emptyObject(obj) + " (depth exceeded)";
-    }
-
     sizeExceededToken = "... (size exceeded)";
-    arrayPrefix = "► ";
     indent = "  ";
     unreoslvedGetter = "... (getter unresolved)";
+
     number(n) {
         return n.toString();
     };
 
     textBlock({lines}: TextBlockScalar) {
         for (let i = 0; i < lines.length; i++) {
-            lines[i] = `${this.multilineMargin}${lines[i]}`;
+            lines[i] = this.lineInMultilineBlock(lines[i]);
         }
         return lines;
     }
 
-    multilineMargin = "| ";
+    lineInMultilineBlock(line: string) {
+        return `| ${line}`;
+    }
+
 
     string(s: string) {
         if (!s.match(/[(\r|\n)]/)) {
@@ -179,7 +197,7 @@ export class YamprintFormatter implements FormatSpecifier {
 
     undefined = "undefined";
 
-    nul = "null";
+    null = "null";
 
 
     date(d) {

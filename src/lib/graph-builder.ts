@@ -19,8 +19,8 @@ export interface GraphBuilderRules {
     maxDepth : number;
     maxObjectLength : number;
     resolveGetters : boolean;
-    propertyFilter : (info : PropertyInfo) => boolean;
-    isPrototypeExplorable : (proto : any) => boolean;
+    propertyFilter (info : PropertyInfo): boolean;
+    isPrototypeExplorable (proto : any): boolean;
     getConstructor(obj : any) : Function;
 }
 
@@ -31,7 +31,7 @@ const notScalar = {};
 export class YamprintGraphBuilder {
     private _knownNodes = new Set<any>();
     private _currentDepth = -1;
-    constructor(private _rules : GraphBuilderRules){
+    constructor(public readonly rules : GraphBuilderRules){
 
     }
 
@@ -66,8 +66,8 @@ export class YamprintGraphBuilder {
     }
 
     protected _readObjectProprties(instance : object) {
-        if (this._rules.maxDepth <= this._currentDepth) {
-            return new EmptyObjectScalar(this._rules.getConstructor(instance)).withMetadata({
+        if (this.rules.maxDepth <= this._currentDepth) {
+            return new EmptyObjectScalar(this.rules.getConstructor(instance)).withMetadata({
                 depthExceeded : true
             });
         }
@@ -88,21 +88,23 @@ export class YamprintGraphBuilder {
             for (let name of names) {
                 //when there is an overriden property on the prototype
                 if (allProperties.has(name)) continue;
-                if (allProperties.size >= this._rules.maxObjectLength) {
-                    reachedMaxProperties = true;
-                    return;
-                }
-                allProperties.set(name, {
+                let propInfo =  {
                     name: name,
                     descriptor: Object.getOwnPropertyDescriptor(definingObject, name),
                     owner: definingObject,
                     treeDepth : this._currentDepth,
                     objectDepth : objectDepth
-                } as PropertyInfo);
+                } as PropertyInfo;
+                if (!this.rules.propertyFilter(propInfo)) continue;
+                if (allProperties.size >= this.rules.maxObjectLength) {
+                    reachedMaxProperties = true;
+                    return;
+                }
+                allProperties.set(name, propInfo);
             }
 
             let proto = Object.getPrototypeOf(definingObject);
-            if (proto && this._rules.isPrototypeExplorable(proto)) {
+            if (proto && this.rules.isPrototypeExplorable(proto)) {
                 registerAllKeys(proto, objectDepth + 1);
             }
         };
@@ -111,15 +113,13 @@ export class YamprintGraphBuilder {
 
         let properties = [] as PropertyItem[];
         for (let [name, property] of allProperties) {
-            let result = this._rules.propertyFilter(property);
-            if (!result) continue;
-            if (property.descriptor.get && !this._rules.resolveGetters) {
+            if (property.descriptor.get && !this.rules.resolveGetters) {
                 properties.push({
                     name : name,
                     value : new UnresolvedGetterScalar()
                 })
             }
-            else if (result === true) {
+            else  {
                 properties.push({
                     name: name,
                     value: resolveKey(name)
@@ -127,14 +127,19 @@ export class YamprintGraphBuilder {
             }
         }
         if (properties.length === 0) {
-            return new EmptyObjectScalar(this._rules.getConstructor(instance));
+            return new EmptyObjectScalar(this.rules.getConstructor(instance));
         }
-        return new ObjectNode(this._rules.getConstructor(instance), properties).withMetadata({
+        return new ObjectNode(this.rules.getConstructor(instance), properties).withMetadata({
             sizeExceeded : reachedMaxProperties
         });
     }
 
-    protected _readArray(value : Array<any>) {
+    protected _readArray(value : any[]) {
+        if (this.rules.maxDepth <= this._currentDepth) {
+            return new EmptyArrayScalar().withMetadata({
+                depthExceeded : true
+            });
+        }
         let lastIndex = -1;
         let isSparse = value.some((x, index) => {
             if (index !== lastIndex + 1) return true;
@@ -149,7 +154,7 @@ export class YamprintGraphBuilder {
             let propertyItems = [] as PropertyItem[];
             for (let key of keys) {
                 if (isNaN(+key)) continue;
-                if (propertyItems.length >= this._rules.maxObjectLength) {
+                if (propertyItems.length >= this.rules.maxObjectLength) {
                     maxSizeReached = true;
                     break;
                 }
@@ -166,7 +171,7 @@ export class YamprintGraphBuilder {
             let maxSizeReached = false;
             let graphItems = [];
             for (let item of value) {
-                if (graphItems.length >= this._rules.maxObjectLength) {
+                if (graphItems.length >= this.rules.maxObjectLength) {
                     maxSizeReached = true;
                     break;
                 }
