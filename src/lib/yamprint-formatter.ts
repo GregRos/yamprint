@@ -56,14 +56,15 @@ export class YamprintFormatter implements FormatSpecifier {
         let str = "";
         if (metadata && metadata.depthExceeded) {
             if (ctor === Object) str = "{...}";
-            else if (!ctor || !ctor.name) str = this._formatCtorTag("{|~anonymous~|}");
-            else str = `{${this.constructorTag(ctor)}}`;
+            else if (!ctor || !ctor.name) str = this._formatCtorTag("{...|~anonymous~|...}");
+            else str = `{...${this.constructorTag(ctor)}...}`;
+            str = `${str} (depth exceeded)`;
         } else {
             if (ctor === Object) str = "{}";
             else if (!ctor || !ctor.name) str = this._formatCtorTag("~anonymous~");
             else str = this.constructorTag(ctor);
         }
-        return `${str} (depth exceeded)`;
+        return str;
     }
 
     propertyKey(key: string) {
@@ -168,10 +169,7 @@ export class YamprintFormatter implements FormatSpecifier {
     };
 
     textBlock({lines}: TextBlockScalar) {
-        for (let i = 0; i < lines.length; i++) {
-            lines[i] = this.lineInMultilineBlock(lines[i]);
-        }
-        return lines;
+        return lines.map(this.lineInMultilineBlock).join("\n");
     }
 
     lineInMultilineBlock(line: string) {

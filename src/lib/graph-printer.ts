@@ -98,7 +98,9 @@ export class YamprintGraphPrinter {
     }
 
     protected _printTextBlock(block : TextBlockScalar) {
-        return this.formatter.textBlock(block);
+        for (let line of block.lines) {
+            this._writer.writeLine(this.formatter.lineInMultilineBlock(line));
+        }
     }
 
     protected _printObject(node : ObjectNode) {

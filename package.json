@@ -1,6 +1,6 @@
 {
   "name": "yamprint",
-  "version": "0.6.0-beta",
+  "version": "0.7.1",
   "description": "Library for pretty-printing objects inspired by YAML.",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
@@ -51,10 +51,10 @@
     "source-map-support": "^0.5.0",
     "tslint": "^5.9.1",
     "tslint-consistent-codestyle": "^1.11.0",
-    "typescript": "^2.5.2"
+    "typescript": "^2.5.2",
+    "@types/lodash": "^4.14.96"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.96",
     "tslib": "^1.7.1"
   }
 }
