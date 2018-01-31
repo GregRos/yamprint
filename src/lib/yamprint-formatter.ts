@@ -36,8 +36,6 @@ export interface FormatSpecifier {
     emptyObject(ctor: Function, metadata : NodeMetadata): any;
 
     binary({name, size}: BinaryScalar): string;
-
-    textBlock({lines}: TextBlockScalar): string[];
 }
 
 export type YamprintTheme = {
@@ -167,10 +165,6 @@ export class YamprintFormatter implements FormatSpecifier {
     number(n) {
         return n.toString();
     };
-
-    textBlock({lines}: TextBlockScalar) {
-        return lines.map(this.lineInMultilineBlock).join("\n");
-    }
 
     lineInMultilineBlock(line: string) {
         return `| ${line}`;
