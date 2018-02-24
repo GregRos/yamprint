@@ -531,7 +531,7 @@ It also supports stuff like word wrapping and has a special format that allows i
                 this.c = {};
             },
             error: new MeaningfulError("Blah!"),
-            functionWithName: function nameOfFunction() {
+            functionWithName: function nameOfFunction(arg1, arg2, arg = 5) {
 
             },
             array: [

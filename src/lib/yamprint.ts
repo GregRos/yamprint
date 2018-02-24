@@ -71,7 +71,7 @@ export const yamprint = create({
         return ["constructor", "arguments", "prototype"].indexOf(prop.name) < 0 && !prop.name.startsWith("__") && !(prop.descriptor.value instanceof Function && prop.objectDepth > 0)
     },
     maxDepth: 10,
-    maxObjectLength: 50,
+    maxObjectLength: Infinity,
     resolveGetters: true,
     isPrototypeExplorable: (proto) => {
         return [Error, Object, Function].map(x => x.prototype).indexOf(proto) < 0

@@ -1,6 +1,6 @@
 import {BinaryTypeInfo} from "./binary-type-identifier";
 import {BinaryScalar, NodeMetadata, PropertyItem, TextBlockScalar} from "./object-graph";
-
+import {getParamNames} from 'parameter.js';
 export interface FormatSpecifier {
     propertyKey(key: string): string;
 
@@ -125,7 +125,8 @@ export class YamprintFormatter implements FormatSpecifier {
         if (f.name) {
             line += ` ${f.name}`;
         }
-        return `|${line}|`;
+        let names = getParamNames(f);
+        return `|function ${f.name}(${names.join(", ")})|`;
     }
 
     binary({name, size}: BinaryScalar) {
