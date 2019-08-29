@@ -1,13 +1,12 @@
 {
   "name": "yamprint",
-  "version": "0.8.1",
+  "version": "0.8.4",
   "description": "Library for pretty-printing objects inspired by YAML.",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "scripts": {
     "test": "node ./dist/__tests__/runner.js",
-    "watch": "gulp watch",
-    "build": "gulp build"
+    "build": "rm -rf dist/ && tsc"
   },
   "repository": "https://github.com/GregRos/yamprint",
   "directories": {

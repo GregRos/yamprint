@@ -1,17 +1,22 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "declaration": true,
     "module": "commonjs",
-    "moduleResolution": "node",
-    "preserveConstEnums": true,
-    "removeComments": false,
+    "target": "es2017",
+    "noImplicitAny": false,
     "sourceMap": true,
-    "target": "ES6",
-    "lib": ["es6"],
     "allowUnreachableCode": true,
-    "importHelpers": true,
+    "experimentalDecorators": true,
+    "lib": [
+      "es2017"
+    ],
+    "declaration": true,
     "outDir": "dist"
   },
-  "exclude": [ "node_modules"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }

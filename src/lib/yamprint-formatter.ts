@@ -82,7 +82,7 @@ export class YamprintFormatter implements FormatSpecifier {
                             return colors[k].call(colors, self[k].apply(this, args));
                         };
                     } else {
-                        this[k] = colors[k].call(colors, this[k]);
+                        this[k] = colors[k];
                     }
                 });
             }
@@ -125,8 +125,7 @@ export class YamprintFormatter implements FormatSpecifier {
         if (f.name) {
             line += ` ${f.name}`;
         }
-        let names = getParamNames(f);
-        return `|function ${f.name}(${names.join(", ")})|`;
+        return `|function ${f.name})|`;
     }
 
     binary({name, size}: BinaryScalar) {
