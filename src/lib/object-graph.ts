@@ -1,84 +1,102 @@
 export interface NodeMetadata {
-    depthExceeded ?: boolean;
-    sizeExceeded ?: boolean;
+    depthExceeded ?: boolean
+    sizeExceeded ?: boolean
 }
 
-export class NodeBase {
-    metadata : NodeMetadata;
-    withMetadata(metadata : NodeMetadata) :  this {
-        this.metadata = metadata;
-        return this;
+export type KeyedCollectionType = "map" | "non-linear-array" | "other";
+
+export type KeylessCollectionType = "array" | "set" | "iterator" | "other";
+
+export type ReferenceCode = number;
+
+export class KeyValuePair {
+    constructor(
+        public key: any,
+        public value: Node
+    ) {
+
+    }
+}
+
+export class KeyedCollection {
+    constructor(
+        public object: object,
+        public type: KeyedCollectionType,
+        public items: KeyValuePair[],
+        public ref: ReferenceCode
+    ) {
+
+    }
+}
+
+export class KeylessCollection {
+    constructor(
+        public object: object,
+        public type: KeylessCollectionType,
+        public items: Node[]
+    ) {
+
+    }
+}
+
+export class ObjectNode {
+    constructor(
+        public object: object,
+        public props: PropertyItem[],
+        public ref: ReferenceCode
+    ) {
+
     }
 }
 
 export class PropertyItem  {
-    constructor(public name: string, public value: Node) {
+    constructor(
+        public owner: object,
+        public name: string | symbol,
+        public value: Node
+    ) {
 
     }
 }
 
-export class SparseArrayNode extends NodeBase {
-    constructor(public items: PropertyItem[]) {
-        super();
+export class ReferenceScalar {
+    constructor(
+        public target: object,
+        public reference: ReferenceCode,
+        public type: "circular" | "adjacent"
+    ) {
+
     }
 }
 
-export class ArrayNode extends NodeBase {
-    constructor(public items: Node[]) {
-        super();
-    }
-}
-
-export class ObjectNode extends NodeBase {
-    constructor(public ctor: Function, public readonly properties: PropertyItem[]) {
-        super();
-    }
-}
-
-export class TextBlockScalar extends NodeBase {
-    constructor(public lines : string[]) {
-        super();
-    }
-}
-
-export class EmptyObjectScalar extends NodeBase {
-    constructor(public readonly ctor : Function) {
-        super();
-    }
-}
-
-export class CircularReferenceScalar extends NodeBase {
-}
-
-export class EmptyArrayScalar extends NodeBase {
-}
-
-export class UnresolvedGetterScalar extends NodeBase {
+export class UnresolvedGetterScalar {
     constructor() {
-        super();
+        
     }
 }
 
-export class BinaryScalar extends NodeBase {
-    constructor(public name: string, public size: number) {
-        super();
+export class BinaryScalar {
+    constructor(
+        public object: object,
+    ) {
+        
     }
 }
 
-export class ThrewErrorScalar extends NodeBase {
+export class ThrewErrorScalar {
     constructor(public error: Error) {
-        super();
+        
     }
 }
 
-export class DepthExceededScalar extends NodeBase {
+export class DepthExceededScalar {
     constructor(public error : Error) {
-        super();
+        
     }
 }
 
 
-export type LiteralScalar = boolean | string | number | Date | RegExp | null | undefined | Symbol | Function;
+export type LiteralScalar = boolean | string | number | Date | RegExp | null | undefined | Symbol | Function
 
 export type ScalarNode =
     LiteralScalar
@@ -87,8 +105,8 @@ export type ScalarNode =
     | CircularReferenceScalar
     | EmptyArrayScalar
     | EmptyObjectScalar
-    | UnresolvedGetterScalar;
+    | UnresolvedGetterScalar
 
-export type ComplexNode = ObjectNode | SparseArrayNode | ArrayNode | TextBlockScalar;
+export type ComplexNode = ObjectNode | SparseArrayNode | ArrayNode | TextBlockScalar
 
-export type Node = ScalarNode | ComplexNode;
+export type Node = ScalarNode | ComplexNode

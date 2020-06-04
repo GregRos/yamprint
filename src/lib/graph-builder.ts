@@ -181,7 +181,7 @@ export class YamprintGraphBuilder {
                 sizeExceeded : maxSizeReached
             });
         }
-    }
+    }g
 
     protected _toGraph(instance : any) {
         this._currentDepth++;
