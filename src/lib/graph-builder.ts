@@ -1,10 +1,11 @@
 import {
-    ArrayNode, BinaryScalar, CircularReferenceScalar, DepthExceededScalar, EmptyArrayScalar, EmptyObjectScalar, Node,
-    NodeBase, ObjectNode,
+    ArrayNode, CircularReferenceScalar, DepthExceededScalar, EmptyArrayScalar, EmptyObjectScalar, NodeBase, ObjectNode,
     PropertyItem,
     SparseArrayNode, TextBlockScalar, ThrewErrorScalar, UnresolvedGetterScalar
-} from "./object-graph";
+} from "./nodes/vector";
 import {BinaryTypeIdentifier} from "./binary-type-identifier";
+import {BinaryScalar} from "./nodes/scalar";
+import {Node} from "./nodes";
 
 
 export interface PropertyInfo {

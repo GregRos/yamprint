@@ -1,14 +1,12 @@
-import {KeyedCollectionType, KeylessCollectionType} from "./enums";
-import {ReferenceCode, ScalarNode} from "./scalar";
+import {LengthExceededScalar, ReferenceCode, ReferenceOnlyScalar} from "./scalar";
+import {Node} from "./index";
 
-export interface NodeMetadata {
-	depthExceeded?: boolean
-	sizeExceeded?: boolean
-}
+export type KeyedCollectionType = "map" | "non-linear-array" | "other";
+export type KeylessCollectionType = "array" | "set" | "iterator" | "other";
 
 export class KeyValuePair {
 	constructor(
-		public key: any,
+		public key: ReferenceOnlyScalar,
 		public value: Node
 	) {}
 }
@@ -18,7 +16,7 @@ export class KeyedCollection {
 	constructor(
 		public object: object,
 		public type: KeyedCollectionType,
-		public items: KeyValuePair[],
+		public items: (KeyValuePair | LengthExceededScalar)[],
 	) {}
 }
 
@@ -35,35 +33,27 @@ export class ObjectNode {
 	ref: ReferenceCode;
 	constructor(
 		public object: object,
-		public props: PropertyItem[]
+		public props: (PropertyItem | LengthExceededScalar)[]
 	) {}
 }
 
 export class PropertyItem {
 	constructor(
 		public owner: object,
-		public name: string | symbol,
+		public key: PropertyKey,
 		public value: Node
 	) {}
 }
 
-export class ErrorObject {
+export class ErrorObjectNode {
 	constructor(
 		public object: object,
 		public stack: string,
 		public message: string,
-		public props: PropertyItem[],
+		public props: (PropertyItem | LengthExceededScalar)[],
 		public ref: ReferenceCode
 	) {}
 }
 
-export class DepthExceededScalar {
-	constructor(public object: object) {
+export type ComplexNode = ObjectNode | ErrorObjectNode | KeylessCollection | KeyedCollection;
 
-	}
-}
-
-
-export type ComplexNode = ObjectNode | SparseArrayNode | ArrayNode | TextBlockScalar
-
-export type Node = ScalarNode | ComplexNode

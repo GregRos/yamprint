@@ -1,9 +1,11 @@
 import {
-    ArrayNode, BinaryScalar, CircularReferenceScalar, EmptyArrayScalar, EmptyObjectScalar, Node, NodeBase, ObjectNode,
+    ArrayNode, CircularReferenceScalar, EmptyArrayScalar, EmptyObjectScalar, NodeBase, ObjectNode,
     SparseArrayNode, TextBlockScalar, ThrewErrorScalar, UnresolvedGetterScalar
-} from "./object-graph";
+} from "./nodes/vector";
 import {YamprintFormatter} from "./yamprint-formatter";
 import {IndentedWriter} from "./indented-writer";
+import {BinaryScalar} from "./nodes/scalar";
+import {Node} from "./nodes";
 
 
 export class YamprintGraphPrinter {

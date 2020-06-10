@@ -1,6 +1,7 @@
 import {BinaryTypeInfo} from "./binary-type-identifier";
-import {BinaryScalar, NodeMetadata, PropertyItem, TextBlockScalar} from "./object-graph";
+import {NodeMetadata, PropertyItem, TextBlockScalar} from "./nodes/vector";
 import {getParamNames} from 'parameter.js';
+import {BinaryScalar} from "./nodes/scalar";
 export interface FormatSpecifier {
     propertyKey(key: string): string;
 

@@ -46,7 +46,8 @@
       true,
       {
         "type": "variable",
-        "format": "camelCase"
+        "format": "camelCase",
+        "leadingUnderscore": "allow"
       },
       {
         "type": "member",
