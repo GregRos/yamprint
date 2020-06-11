@@ -1,4 +1,4 @@
-import {BinaryDataType, BinaryScalar} from "../nodes/scalar";
+import {BinaryDataType, BinaryScalar, BinaryScalarType} from "../nodes/scalar";
 
 declare let Blob, Uint16Array, BigInt64Array, BigUint64Array;
 
@@ -16,9 +16,10 @@ const BigUint64ArrayCtor: typeof Int8Array = typeof BigUint64Array !== "undefine
 // tslint:disable-next-line:naming-convention
 const BufferCtor: typeof Buffer = typeof Buffer !== "undefined" ? Buffer : noMatch;
 
-interface BinaryInfo {
+export interface BinaryInfo {
 	size: number;
 	data: BinaryDataType;
+	type: BinaryScalarType;
 }
 
 function getArrayDataType(x: object): BinaryDataType {
@@ -54,29 +55,34 @@ function getArrayDataType(x: object): BinaryDataType {
 // tslint:disable-next-line:naming-convention
 const TypedArray = Object.getPrototypeOf(Uint8Array.prototype).constructor;
 
-function getBinInfo(obj): BinaryInfo | null {
+export function getBinInfo(obj): BinaryInfo | null {
 	if (BlobCtor && obj instanceof BlobCtor) {
 		return {
+			type: "Blob",
 			size: obj.size,
 			data: "byte"
 		};
 	} else if (obj instanceof ArrayBuffer) {
 		return {
+			type: "ArrayBuffer",
 			size: obj.byteLength,
 			data: "byte"
 		};
 	} else if (obj instanceof TypedArray) {
 		return {
+			type: "TypedArray",
 			size: obj.length,
 			data: getArrayDataType(obj)
 		};
 	} else if (obj instanceof DataView) {
 		return {
+			type: "DataView",
 			size: obj.byteLength,
 			data: "byte"
 		};
 	} else if (obj instanceof BufferCtor) {
 		return {
+			type: "Buffer",
 			size: obj.length,
 			data: "byte"
 		};

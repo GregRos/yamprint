@@ -1,4 +1,4 @@
-import {LengthExceededScalar, ReferenceCode, ReferenceOnlyScalar} from "./scalar";
+import {LengthExceededScalar, ReferenceCode, RefOnlyNode} from "./scalar";
 import {Node} from "./index";
 
 export type KeyedCollectionType = "map" | "non-linear-array" | "other";
@@ -6,7 +6,7 @@ export type KeylessCollectionType = "array" | "set" | "iterator" | "other";
 
 export class KeyValuePair {
 	constructor(
-		public key: ReferenceOnlyScalar,
+		public key: RefOnlyNode,
 		public value: Node
 	) {}
 }
@@ -54,6 +54,7 @@ export class ErrorObjectNode {
 		public ref: ReferenceCode
 	) {}
 }
+
 
 export type ComplexNode = ObjectNode | ErrorObjectNode | KeylessCollection | KeyedCollection;
 

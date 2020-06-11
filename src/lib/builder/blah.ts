@@ -1,52 +1,49 @@
 import {ScalarNode} from "../nodes/scalar";
 
+
+export type KeyedItemType = "property" | "kvp" | "element"
+
+export interface GenericKeyedValueInfo {
+	readonly key: any;
+	readonly type: KeyedItemType;
+	readonly isEvaluated: boolean;
+	readonly value: unknown;
+	readonly owner: object;
+}
+
+export interface PropertyInfo extends GenericKeyedValueInfo {
+	key: PropertyKey;
+	type: "property";
+}
+
+export interface KvpInfo extends GenericKeyedValueInfo {
+	readonly type: "kvp";
+	readonly isEvaluated: true;
+}
+
+export interface ElementInfo {
+	readonly type: "element";
+	readonly key: number;
+	readonly isEvaluated: true;
+}
+
 export type ObjectClassification =
 	| "object"
 	| "keyed-collection"
-	| "keyless-collection"
-	| "primitive"
-	| "binary"
-	| "error"
-	| "ref-only";
-
-export interface PropertyInfo {
-	type: "property";
-	key: PropertyKey;
-	owner: object;
-	isGetter: boolean;
-	value(): any;
-}
-
-export interface KeyInfo {
-	type: "key";
-	key: any;
-	value: any;
-	owner: object;
-}
-
-export interface ItemInfo {
-	type: "item";
-
-}
-
-export interface PropertyInfo {
-	key: PropertyKey;
-	owner: object;
-	value(): unknown | null | undefined;
-	isGetter: boolean;
-}
+	| "keyless-collection";
 
 
-export type ExplorationType = "skip" | "display" | "explore";
+export type SomeKeyedValueInfo = PropertyInfo | KvpInfo | ElementInfo;
+
+export type ExploreAction = "skip" | "ref-only" | "explore";
 
 export interface ExplorationRules {
 	explore: {
+		skipAdjacent: boolean;
 		prototype(target: object, proto: object): boolean;
-		property(target: object, info: PropertyInfo): boolean;
-		element(target: object, info: ElementInfo): boolean;
+		property(target: object, info: SomeKeyedValueInfo): ExploreAction;
 	};
-	tryParseScalar(target: unknown): ScalarNode;
-
+	isKeyedCollection(target: object): boolean;
 	max: {
 		size: number;
 		containmentDepth: number;
