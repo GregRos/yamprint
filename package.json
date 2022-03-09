@@ -31,12 +31,19 @@
   "license": "MIT",
   "devDependencies": {
     "@types/chalk": "^0.4.31",
+    "@types/eslint": "^8.4.1",
     "@types/gulp": "^4.0.4",
     "@types/jasmine": "^2.6.0",
+    "@types/lodash": "^4.14.96",
     "@types/node": "^8.0.30",
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "@typescript-eslint/types": "^5.10.1",
+    "@typescript-eslint/utils": "^5.10.1",
     "chalk": "^2.1.0",
     "codecov": "^2.3.0",
     "del": "^3.0.0",
+    "eslint": "^8.7.0",
     "glob": "^7.1.2",
     "gulp": "^3.9.1",
     "gulp-clean": "^0.3.2",
@@ -51,8 +58,7 @@
     "source-map-support": "^0.5.0",
     "tslint": "^5.9.1",
     "tslint-consistent-codestyle": "^1.11.0",
-    "typescript": "^2.5.2",
-    "@types/lodash": "^4.14.96"
+    "typescript": "^2.5.2"
   },
   "dependencies": {
     "parameter.js": "^1.0.0",

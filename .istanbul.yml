@@ -5,6 +5,6 @@ instrumentation:
   default-excludes: true
   excludes:
     - "**/*.no-cover.js"
-    - "**/__tests__/**" #no need to instrument this test code! Things references by it remain covered.
+    - "**/tests/**" #no need to instrument this test code! Things references by it remain covered.
     - "**/internal/errors.js" #contains things like exception throws, not executable code
     - "**/lib/index.js" #no executable code
